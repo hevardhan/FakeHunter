@@ -1,30 +1,42 @@
+#-----------------------------------------------------------------#
+# I M P O R T S                                                   #
+#-----------------------------------------------------------------#
 import tkinter as t
-from tkinter import ttk
-import threading
-from PIL import ImageTk, Image
-import pytchat
-import time
-import pandas as pd
-import numpy as np
 from tkinter import messagebox
 from tkinter import filedialog as fd
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-obj = SentimentIntensityAnalyzer()
+from PIL import ImageTk, Image
+import pytchat
+import pandas as pd
+import numpy as np
 from chat_downloader import ChatDownloader
 import matplotlib.pyplot as plt
 
-comment_list = []
+# from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+# obj = SentimentIntensityAnalyzer()
 
+#----------------------------------------------------------------#
+# F L A G   W O R D S   L I S T S                                #
+#----------------------------------------------------------------#
 flag_list_2 = ['loss','ghatta','indicator','buy','sell','telegram','whatsapp','wattsapp','join my','premium','tp','sl','stop','profit','teligram','hit']
 flag_list_1 = ['profit','education','risk']
+
+#----------------------------------------------------------------#
+# M A I N   C L A S S                                            #
+#----------------------------------------------------------------#
 class Main:
-    def __init__(self):
+    #---------------------------#
+    # Init Function             #
+    #---------------------------#
+    def __init__(self): 
         self.flag_positive = 0
         self.flag_negative = 0
         self.flag_neutral  = 0
         self.data = {}
-        
-    def gen_sentiment(self):
+    
+    #---------------------------#
+    # Visualization Function    #
+    #---------------------------#
+    def gen_visual(self):
         listbox_items = mylist.get(0,t.END)
         no_items = len(listbox_items)
         for item in listbox_items:
@@ -49,7 +61,10 @@ class Main:
         labels = ['Positive','Negative','Neutral']
         plt.pie(amount, labels = labels)
         plt.show()
-        
+    
+    #----------------------------#
+    # Scrape Comment Function    #
+    #----------------------------#    
     def scrapeCom(self):
         text = url_f2_entry.get()
         radio = v.get()
@@ -76,6 +91,9 @@ class Main:
                     # self.time.append(message['time_in_seconds'])
                     mylist.insert(t.END,f"Comment : {msg}")
 
+    #----------------------------#
+    # Generate Excel Function    #
+    #----------------------------#
     def save_xl(self):
         a = fd.asksaveasfilename(initialfile="Untitled.xlsx",defaultextension=".xlsx",filetypes = [('excel files', '*.xlsx'),('All files', '*.*')])
         df = pd.DataFrame(data=self.data)
@@ -87,9 +105,10 @@ class Main:
         with pd.ExcelWriter(a) as writer:
             df.to_excel(writer,sheet_name="comment_data")
             df_auth.to_excel(writer,sheet_name="author_data")
-        
-def invalid_msg():
-    messagebox.showerror("","Currently Under Development")
+
+#--------------------------------------------------------#
+# D E V E L O P E R   I N F O   F U N C T I O N          #
+#--------------------------------------------------------#
 def dev_info():
     info = '''               
     Team FakeHunter
@@ -101,6 +120,9 @@ def dev_info():
     '''
     messagebox.showinfo("Developer Information",info)
 
+#--------------------------------------------------------#
+# H E L P   F U N C T I O N                              #
+#--------------------------------------------------------#
 def help_info():
     help_in = '''
     Step 1 : Enter the url in the given text box
@@ -109,8 +131,13 @@ def help_info():
     Step 4 : Click "Generate Excel" to generate all these data to excel sheet
     '''
     messagebox.showinfo("Help",help_in)
-###############################
+    
 
+###################################################################################################################################
+
+#----------------------------------------#
+# U S E R   I N T E R F A C E            #
+#----------------------------------------#
 win = t.Tk()
 win.title("Fake Hunter")
 
@@ -140,7 +167,7 @@ url_f2 = t.Label(f2, text = "Enter the Youtube URL    : ",font=("Lucida Sans",18
 url_f2_entry = t.Entry(f2,font=("Lucida Sans",18,"bold"))
 scrape_btn = t.Button(f2,text = "Scrape Comments",font=("Lucida Sans",18,"bold"),command=app.scrapeCom)
 gen_xl_btn = t.Button(f2,text = "Generate Excel",font=("Lucida Sans",18,"bold"),command=app.save_xl)
-gen_senti_btn = t.Button(f2,text="Generate Visualization",font=("Lucida Sans",18,"bold"),command=app.gen_sentiment)
+gen_senti_btn = t.Button(f2,text="Generate Visualization",font=("Lucida Sans",18,"bold"),command=app.gen_visual)
 
 title_f2  = t.Label(f2,text="Choose the type of video :",font=("Lucida Sans",18,"bold"),bg="#333333",fg = "white")
 v = t.StringVar()
