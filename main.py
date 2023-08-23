@@ -32,6 +32,8 @@ class Main:
         self.flag_negative = 0
         self.flag_neutral  = 0
         self.data = {}
+        self.radio = ""
+        self.data_number = 0
     
     #---------------------------#
     # Visualization Function    #
@@ -67,19 +69,24 @@ class Main:
     #----------------------------#    
     def scrapeCom(self):
         text = url_f2_entry.get()
-        radio = v.get()
+        self.radio = v.get()
         key = text.split("=")
-        if radio == 'Live':
+        if self.radio == 'Live':
             chat = pytchat.create(video_id=key[1])
             
             for c in chat.get().sync_items():
                 msg = c.message.lower().split(" ") #Splits the Comment
                 mylist.insert(t.END,f"Comment : {c.message}")
-                print(msg)
-                
-            mylist.after(100,Main.scrapeCom)
+                self.data[self.data_number] = {"message" : c.message,
+                                               "timestamp":c.timestamp,
+                                               "Author-User Name":c.author.name,
+                                               "Author Channel":c.author.channelId,
+                                               "message_Id":c.id}
+                self.data_number += 1
+            # mylist.after(1000,Main.scrapeCom(self)) 
             
-        elif radio == 'Pre-recorded':
+            
+        elif self.radio == 'Pre-recorded':
             url = text
             chat = ChatDownloader().get_chat(url)       # create a generator
             data_num = 0
@@ -96,16 +103,20 @@ class Main:
     #----------------------------#
     def save_xl(self):
         a = fd.asksaveasfilename(initialfile="Untitled.xlsx",defaultextension=".xlsx",filetypes = [('excel files', '*.xlsx'),('All files', '*.*')])
-        df = pd.DataFrame(data=self.data)
-        df = df.transpose()
-        df_author = df['author'].to_dict()
-        df = df.drop("author",axis=1)
-        df_auth = pd.DataFrame(df_author)
-        df_auth = df_auth.transpose()
-        with pd.ExcelWriter(a) as writer:
-            df.to_excel(writer,sheet_name="comment_data")
-            df_auth.to_excel(writer,sheet_name="author_data")
-
+        if self.radio == "Pre-recorded":
+            df = pd.DataFrame(data=self.data)
+            df = df.transpose()
+            df_author = df['author'].to_dict()
+            df = df.drop("author",axis=1)
+            df_auth = pd.DataFrame(df_author)
+            df_auth = df_auth.transpose()
+            with pd.ExcelWriter(a) as writer:
+                df.to_excel(writer,sheet_name="comment_data")
+                df_auth.to_excel(writer,sheet_name="author_data")
+        elif self.radio == 'Live':
+            df = pd.DataFrame(data = self.data)
+            df = df.transpose()
+            df.to_excel(a,sheet_name="data")
 #--------------------------------------------------------#
 # D E V E L O P E R   I N F O   F U N C T I O N          #
 #--------------------------------------------------------#
