@@ -6,8 +6,6 @@ import pytchat
 import time
 import pandas as pd
 import numpy as np
-import googleapiclient.discovery
-import os
 from tkinter import messagebox
 from tkinter import filedialog as fd
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
@@ -42,6 +40,7 @@ class Main:
                     self.flag_positive += 1
                 else:
                     self.flag_neutral += 1
+                    
         pos_percent = (self.flag_positive/no_items)
         neg_percent = (self.flag_negative/no_items)
         neu_percent = (self.flag_neutral/no_items)
@@ -110,6 +109,7 @@ def help_info():
     Step 4 : Click "Generate Excel" to generate all these data to excel sheet
     '''
     messagebox.showinfo("Help",help_in)
+###############################
 
 win = t.Tk()
 win.title("Fake Hunter")
