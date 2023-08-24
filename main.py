@@ -10,6 +10,7 @@ import pandas as pd
 import numpy as np
 from chat_downloader import ChatDownloader
 import matplotlib.pyplot as plt
+import plotly.express as px
 
 # from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 # obj = SentimentIntensityAnalyzer()
@@ -34,6 +35,7 @@ class Main:
         self.data = {}
         self.radio = ""
         self.data_number = 0
+        self.dict_graph = {}
     
     #---------------------------#
     # Visualization Function    #
@@ -41,6 +43,7 @@ class Main:
     def gen_visual(self):
         listbox_items = mylist.get(0,t.END)
         no_items = len(listbox_items)
+        dict_counter = 0
         for item in listbox_items:
             x = item.split("Comment : ")
             comment = x[1]
@@ -48,21 +51,24 @@ class Main:
             msg_list = msg.split(" ")
             for word in msg_list:
                 if word in flag_list_2:
-                    flagged_comment = comment
                     self.flag_negative += 1
                 elif word in flag_list_1:
                     self.flag_positive += 1
                 else:
                     self.flag_neutral += 1
-                    
-        pos_percent = (self.flag_positive/no_items)
-        neg_percent = (self.flag_negative/no_items)
-        neu_percent = (self.flag_neutral/no_items)
+            self.dict_graph[dict_counter] = {"Comment":comment,
+                                             "Positive":self.flag_positive,
+                                             "Negative":self.flag_negative,
+                                             "Neutral":self.flag_neutral}
+            dict_counter += 1
+
+        df_graph = pd.DataFrame(self.dict_graph).transpose()
+        df_graph = df_graph.drop("Comment",axis=1)
+        df_graph = df_graph.drop("Neutral",axis=1)
         
-        amount = np.array([pos_percent,neg_percent,neu_percent])
-        labels = ['Positive','Negative','Neutral']
-        plt.pie(amount, labels = labels)
-        plt.show()
+        fig = px.area(df_graph,color_discrete_sequence=["green", "red"],title="Sentiment Curve")
+        fig.show()
+        
     
     #----------------------------#
     # Scrape Comment Function    #
